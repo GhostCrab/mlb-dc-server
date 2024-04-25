@@ -1,20 +1,16 @@
 package main
 
 import (
-  "fmt"
-  "time"
-  "log"
-  "io"
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
 
-  "encoding/json"
+	"net/http"
 
-  "net/url"
-  "net/http"
-
-  "go.mongodb.org/mongo-driver/bson"
-  "go.mongodb.org/mongo-driver/bson/primitive"
-  "go.mongodb.org/mongo-driver/mongo"
-  "go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func hello(w http.ResponseWriter, req *http.Request) {
@@ -37,32 +33,72 @@ func main() {
 
   // http.ListenAndServe(":4090", nil)
 
-  proxyUrl, err := url.Parse("http://lax-fpproxy.ext.ray.com:80")
+  // proxyUrl, err := url.Parse("http://lax-fpproxy.ext.ray.com:80")
 
-  tr := &http.Transport{
-    MaxIdleConns:       10,
-    IdleConnTimeout:    30 * time.Second,
-    DisableCompression: true,
-    Proxy: http.ProxyURL(proxyUrl),
-  }
+	// if err != nil {
+  //   log.Fatal(err)
+  // }
 
-  client := &http.Client{Transport: tr}
-  resp, err := client.Get("https://bdfed.stitch.mlbinfra.com/bdfed/transform-mlb-schedule?sportId=1&startDate=2024-04-22&endDate=2024-04-22&gameType=R")
 
-  if err != nil {
-    log.Fatal(err)
-  }
+	// http
+
+  // tr := &http.Transport{
+  //   MaxIdleConns:       10,
+  //   IdleConnTimeout:    30 * time.Second,
+  //   DisableCompression: true,
+  //   // Proxy: http.ProxyURL(proxyUrl),
+  // }
+
+  // client := &http.Client{Transport: tr}
+  // resp, err := client.Get("https://bdfed.stitch.mlbinfra.com/bdfed/transform-mlb-schedule?sportId=1&startDate=2024-04-22&endDate=2024-04-22&gameType=R")
+
+  // if err != nil {
+  //   log.Fatal(err)
+  // }
   
-  defer resp.Body.Close()
-  body, err := io.ReadAll(resp.Body)
+  // defer resp.Body.Close()
+  // body, err := io.ReadAll(resp.Body)
 
-  if err != nil {
+  // if err != nil {
+  //   log.Fatal(err)
+  // }
+
+  // var result MLBAPIResponse
+
+  // json.Unmarshal(body, &result)
+
+  // fmt.Println(result.TotalGames)
+
+	mongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://madmin:password@gserver:27017/"))
+	if err != nil {
+		panic(err)
+	}
+
+	if err != nil {
     log.Fatal(err)
   }
 
-  var result MLBAPIResponse
+	defer func() {
+		if err := mongoClient.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
 
-  json.Unmarshal(body, &result)
+	coll := mongoClient.Database("sample_mflix").Collection("movies")
+	title := "Back to the Future"
+	var result bson.M
+	err = coll.FindOne(context.TODO(), bson.D{{"title", title}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		fmt.Printf("No document was found with the title %s\n", title)
+		return
+	}
+	if err != nil {
+		panic(err)
+	}
+	jsonData, err := json.MarshalIndent(result, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%s\n", jsonData)
 
-  fmt.Println(result.TotalGames)
 }
