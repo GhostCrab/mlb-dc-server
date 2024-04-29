@@ -1,4 +1,4 @@
-module pielow.io/http-servers
+module pielow.io/http-server
 
 go 1.22.2
 
