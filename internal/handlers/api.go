@@ -1,20 +1,22 @@
 package handlers
 
 import (
-	"github.com/ghostcrab/mlb-dc-server/internal/middleware"
-	"github.com/go-chi/chi"
-	chimiddle "github.com/go-chi/chi/middleware"
+	"net/http"
 )
 
-func Handler(r *chi.Mux) {
+func Handler(r *http.ServeMux) {
 	// Global middleware
-	r.Use(chimiddle.StripSlashes)
+	// r.Use(chimiddle.StripSlashes)
 
-	r.Route("/account", func(router chi.Router) {
+	r.HandleFunc("/account/{func}", func(w http.ResponseWriter, r *http.Request) {
+
+		id := r.PathValue("func")
 
 		// Middleware for /account route
-		router.Use(middleware.Authorization)
+		// router.Use(middleware.Authorization)
 
-		router.Get("/coins", GetCoinBalance)
+		w.Write([]byte(id))
+
+		// router.Get("/coins", GetCoinBalance)
 	})
 }
