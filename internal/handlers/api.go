@@ -17,6 +17,6 @@ func Handler(r *http.ServeMux) {
 
 		w.Write([]byte(id))
 
-		// router.Get("/coins", GetCoinBalance)
+		// 'router.Get("/coins", GetCoinBalance)
 	})
 }

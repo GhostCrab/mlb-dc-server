@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/ghostcrab/mlb-dc-server/internal/handlers"
-	"github.com/ghostcrab/mlb-dc-server/internal/tools"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -17,8 +16,8 @@ func main(){
 
 	fmt.Println("Starting GO API service...")
 
-	// go handlers.GetGames(false)
-	go tools.DoMongo()
+	go handlers.GetGames(false)
+	// go tools.DoMongo()
 
   err := http.ListenAndServe("localhost:8000", r)
   if err != nil {
