@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ghostcrab/mlb-dc-server/internal/handlers"
+	"github.com/ghostcrab/mlb-dc-server/internal/tools"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,7 +17,17 @@ func main(){
 
 	fmt.Println("Starting GO API service...")
 
-	go handlers.GetGames(false)
+	// go handlers.GetGames(false, "2024-03-20", "2024-03-31")
+	// go handlers.GetGames(false, "2024-04-01", "2024-04-30")
+	// go handlers.GetGames(false, "2024-05-01", "2024-05-31")
+	// go handlers.GetGames(false, "2024-06-01", "2024-06-30")
+	// go handlers.GetGames(false, "2024-07-01", "2024-07-31")
+	// go handlers.GetGames(false, "2024-08-01", "2024-08-31")
+	// go handlers.GetGames(false, "2024-09-01", "2024-09-29")
+
+	go tools.WatchForChanges()
+
+	go handlers.GetGames(false, "2024-05-07", "2024-05-09")
 	// go tools.DoMongo()
 
   err := http.ListenAndServe("localhost:8000", r)

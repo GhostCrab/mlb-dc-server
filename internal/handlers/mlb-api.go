@@ -64,7 +64,7 @@ func ConvertMLBAPIGame(g types.MLBAPIGame) (types.MLBGame, error) {
   return result, nil
 }
 
-func GetGames(doProxy bool) {
+func GetGames(doProxy bool, startDate string, endDate string) {
   var tr *http.Transport
 
   if doProxy {
@@ -89,7 +89,8 @@ func GetGames(doProxy bool) {
   }
 
   client := &http.Client{Transport: tr}
-  resp, err := client.Get("https://bdfed.stitch.mlbinfra.com/bdfed/transform-mlb-schedule?sportId=1&startDate=2024-03-20&endDate=2024-09-30&gameType=R")
+	url := fmt.Sprintf("https://bdfed.stitch.mlbinfra.com/bdfed/transform-mlb-schedule?sportId=1&startDate=%v&endDate=%v&gameType=R", startDate, endDate)
+  resp, err := client.Get(url)
 
   if err != nil {
     panic(err)

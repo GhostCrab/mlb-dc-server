@@ -74,3 +74,45 @@ func AddGames(games []types.MLBGame) {
 	fmt.Printf("Number of documents replaced or updated: %d\n", results.ModifiedCount)
 	fmt.Printf("Number of documents deleted: %d\n", results.DeletedCount)
 }
+
+func WatchForChanges() {
+	mongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://madmin:password@gserver:27017/"))
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := mongoClient.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
+
+	coll := mongoClient.Database("mlb_dc").Collection("games")
+
+	var pipeline mongo.Pipeline
+
+	// Creates a change stream that receives change events
+	cs, err := coll.Watch(context.TODO(), pipeline)
+	if err != nil {
+		panic(err)
+	}
+	defer cs.Close(context.TODO())
+
+	fmt.Println("Waiting For Change Events. Insert something in MongoDB!")
+
+	// Prints a message each time the change stream receives an event
+	for cs.Next(context.TODO()) {
+		var event bson.M
+		if err := cs.Decode(&event); err != nil {
+			panic(err)
+		}
+		output, err := json.MarshalIndent(event["fullDocument"], "", "    ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("%s\n", output)
+	}
+	if err := cs.Err(); err != nil {
+		panic(err)
+	}
+}
