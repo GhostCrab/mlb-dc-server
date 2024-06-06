@@ -17,18 +17,22 @@ func main(){
 
 	fmt.Println("Starting GO API service...")
 
-	// go handlers.GetGames(false, "2024-03-20", "2024-03-31")
-	// go handlers.GetGames(false, "2024-04-01", "2024-04-30")
-	// go handlers.GetGames(false, "2024-05-01", "2024-05-31")
-	// go handlers.GetGames(false, "2024-06-01", "2024-06-30")
-	// go handlers.GetGames(false, "2024-07-01", "2024-07-31")
-	// go handlers.GetGames(false, "2024-08-01", "2024-08-31")
-	// go handlers.GetGames(false, "2024-09-01", "2024-09-29")
+	go handlers.GetGames(false, "2024-03-20", "2024-03-31")
+	go handlers.GetGames(false, "2024-04-01", "2024-04-30")
+	go handlers.GetGames(false, "2024-05-01", "2024-05-31")
+	go handlers.GetGames(false, "2024-06-01", "2024-06-30")
+	go handlers.GetGames(false, "2024-07-01", "2024-07-31")
+	go handlers.GetGames(false, "2024-08-01", "2024-08-31")
+	go handlers.GetGames(false, "2024-09-01", "2024-09-29")
 
-	go tools.WatchForChanges()
+	go tools.WatchForChanges()  
 
-	go handlers.GetGames(false, "2024-05-07", "2024-05-09")
+	// go handlers.GetGames(false, "2024-06-05", "2024-06-05")
 	// go tools.DoMongo()
+
+	// Serve Websocket connections using WebsocketHandler.
+	wsHandler := handlers.DoCentrifuge()
+	http.Handle("/socket.io", wsHandler)
 
   err := http.ListenAndServe("localhost:8000", r)
   if err != nil {

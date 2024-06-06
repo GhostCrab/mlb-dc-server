@@ -28,6 +28,14 @@ func ConvertMLBAPIGame(g types.MLBAPIGame) (types.MLBGame, error) {
     GameTime: t.Unix(),
   }
 
+	UID, err := GetGameUID(result)
+
+	if err != nil {
+		panic(err)
+	}
+
+	result.UID = UID
+
   if strings.Contains(g.Status.DetailedState, "In Progress") {
     result.Active = true
   }
@@ -64,7 +72,13 @@ func ConvertMLBAPIGame(g types.MLBAPIGame) (types.MLBGame, error) {
   return result, nil
 }
 
+func GetGameUID(game types.MLBGame) (string, error) {
+	return fmt.Sprintf("%d-%d", game.ID, game.GameTime), nil
+}
+
 func GetGames(doProxy bool, startDate string, endDate string) {
+	startTime := time.Now()
+
   var tr *http.Transport
 
   if doProxy {
@@ -107,7 +121,9 @@ func GetGames(doProxy bool, startDate string, endDate string) {
 
   json.Unmarshal(body, &result)
 
-  fmt.Println(result.TotalGames)
+  processTime := time.Now()
+	executionTime := processTime.Sub(startTime)
+	fmt.Printf("GetGames received and processed %d games in %v\n", result.TotalGames, executionTime)
 
   var games []types.MLBGame
 
@@ -123,4 +139,12 @@ func GetGames(doProxy bool, startDate string, endDate string) {
   }
 
   tools.AddGames(games)
+
+	totalTime := time.Now()
+
+	executionTime = totalTime.Sub(processTime)
+	fmt.Printf("GetGames db update executed in %v\n", executionTime)
+
+	executionTime = totalTime.Sub(startTime)
+	fmt.Printf("GetGames executed in %v\n", executionTime)
 }

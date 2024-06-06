@@ -1,7 +1,8 @@
 package types
 
 type MLBGame struct {
-	ID        int64  `bson:"_id"`
+	UID       string `bson:"_id"`
+	ID        int64  `bson:"id"`
 	Home      string `bson:"home_team"`
 	Away      string `bson:"away_team"`
 	HomeScore int64  `bson:"home_score"`
@@ -9,6 +10,6 @@ type MLBGame struct {
 	Active    bool   `bson:"active,omitempty"`
 	Complete  bool   `bson:"complete,omitempty"`
 	Canceled  bool   `bson:"canceled,omitempty"`
-	GameTime  int64  `bson:"game_time	"`
+	GameTime  int64  `bson:"game_time"`
 	Status    string `bson:"status,omitempty"`
 }

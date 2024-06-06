@@ -59,7 +59,7 @@ func AddGames(games []types.MLBGame) {
 
 	for _, game := range games {
 		models = append(models, 
-			mongo.NewReplaceOneModel().SetFilter(bson.D{{Key: "_id", Value: game.ID}}).SetUpsert(true).SetReplacement(game))
+			mongo.NewReplaceOneModel().SetFilter(bson.D{{Key: "_id", Value: game.UID}}).SetUpsert(true).SetReplacement(game))
 	}
 
 	opts := options.BulkWrite().SetOrdered(true)
@@ -70,9 +70,10 @@ func AddGames(games []types.MLBGame) {
 		panic(err)
  	}
 
-	fmt.Printf("Number of documents inserted: %d\n", results.InsertedCount)
-	fmt.Printf("Number of documents replaced or updated: %d\n", results.ModifiedCount)
-	fmt.Printf("Number of documents deleted: %d\n", results.DeletedCount)
+	fmt.Println(results)
+	// fmt.Printf("Number of documents inserted: %d\n", results.InsertedCount)
+	// fmt.Printf("Number of documents replaced or updated: %d\n", results.ModifiedCount)
+	// fmt.Printf("Number of documents deleted: %d\n", results.DeletedCount)
 }
 
 func WatchForChanges() {
@@ -106,11 +107,12 @@ func WatchForChanges() {
 		if err := cs.Decode(&event); err != nil {
 			panic(err)
 		}
-		output, err := json.MarshalIndent(event["fullDocument"], "", "    ")
+
+		_, err := json.MarshalIndent(event["fullDocument"], "", "    ")
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s\n", output)
+		// fmt.Printf("%s\n", output)
 	}
 	if err := cs.Err(); err != nil {
 		panic(err)
