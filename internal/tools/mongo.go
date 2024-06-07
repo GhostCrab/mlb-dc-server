@@ -12,6 +12,8 @@ import (
 )
 
 func DoMongo() {
+	fmt.Println("GetGames Begin")
+
 	mongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://madmin:password@gserver:27017/"))
 	if err != nil {
 		panic(err)
@@ -23,22 +25,31 @@ func DoMongo() {
 		}
 	}()
 
-	coll := mongoClient.Database("sample_mflix").Collection("movies")
-	title := "Back to the Future"
-	var result bson.M
-	err = coll.FindOne(context.TODO(), bson.D{{"title", title}}).Decode(&result)
+	coll := mongoClient.Database("mlb_dc").Collection("games")
+	cursor, err := coll.Find(context.TODO(), bson.D{})
+	
 	if err == mongo.ErrNoDocuments {
-		fmt.Printf("No document was found with the title %s\n", title)
+		fmt.Printf("No documents found\n")
 		return
 	}
+
 	if err != nil {
 		panic(err)
 	}
-	jsonData, err := json.MarshalIndent(result, "", "    ")
+
+	var results []types.MLBGame
+
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
+	}
+
+	fmt.Println("GetGames Called")
+
+	jsonData, err := json.Marshal(results[0:5])
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s\n", jsonData)
+	fmt.Println(string(jsonData))
 }
 
 func AddGames(games []types.MLBGame) {
@@ -70,10 +81,7 @@ func AddGames(games []types.MLBGame) {
 		panic(err)
  	}
 
-	fmt.Println(results)
-	// fmt.Printf("Number of documents inserted: %d\n", results.InsertedCount)
-	// fmt.Printf("Number of documents replaced or updated: %d\n", results.ModifiedCount)
-	// fmt.Printf("Number of documents deleted: %d\n", results.DeletedCount)
+	fmt.Printf("%d Games; %d Updated; %d Inserted;\n", len(games), results.ModifiedCount, results.UpsertedCount)
 }
 
 func WatchForChanges() {
