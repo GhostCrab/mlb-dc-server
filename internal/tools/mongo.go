@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func DoMongo() {
+func DoMongo() string {
 	fmt.Println("GetGames Begin")
 
 	mongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://madmin:password@gserver:27017/"))
@@ -30,7 +30,7 @@ func DoMongo() {
 	
 	if err == mongo.ErrNoDocuments {
 		fmt.Printf("No documents found\n")
-		return
+		return ""
 	}
 
 	if err != nil {
@@ -45,11 +45,11 @@ func DoMongo() {
 
 	fmt.Println("GetGames Called")
 
-	jsonData, err := json.Marshal(results[0:5])
+	jsonData, err := json.Marshal(results)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(jsonData))
+	return string(jsonData)
 }
 
 func AddGames(games []types.MLBGame) {

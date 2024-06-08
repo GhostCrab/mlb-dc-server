@@ -3,6 +3,8 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/ghostcrab/mlb-dc-server/internal/tools"
 )
 
 func Handler(r *http.ServeMux) {
@@ -10,6 +12,7 @@ func Handler(r *http.ServeMux) {
 	// r.Use(chimiddle.StripSlashes)
 
 	r.HandleFunc("/games", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to the HomePage!")
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, tools.DoMongo())
 	})
 }
