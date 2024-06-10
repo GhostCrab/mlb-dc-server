@@ -7,6 +7,7 @@ import (
 )
 
 func DoCentrifuge() *centrifuge.WebsocketHandler {
+	log.Println("Doing Centrifuge")
 	node, err := centrifuge.New(centrifuge.Config{})
 	if err != nil {
 		log.Fatal(err)

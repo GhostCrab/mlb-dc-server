@@ -28,11 +28,11 @@ func main(){
 	go tools.WatchForChanges()  
 
 	// go handlers.GetGames(false, "2024-06-06", "2024-06-06")
-	go tools.DoMongo()
+	// go tools.DoMongo()
 
 	// Serve Websocket connections using WebsocketHandler.
 	wsHandler := handlers.DoCentrifuge()
-	http.Handle("/socket.io", wsHandler)
+	http.Handle("/connection/websocket", wsHandler)
 
   err := http.ListenAndServe("localhost:8000", r)
   if err != nil {
@@ -40,5 +40,4 @@ func main(){
   }
 
 	fmt.Println("after startup")
-
 }
